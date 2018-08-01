@@ -38,6 +38,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     );
 
     // Pipe operator allows to transform the emitted state
+    // TODO: Unsubscribe
     this.store.pipe(select('products')).subscribe((data) => {
       console.log('state update', data);
       if (data) {
