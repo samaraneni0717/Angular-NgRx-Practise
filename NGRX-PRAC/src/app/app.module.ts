@@ -20,6 +20,7 @@ import { UserModule } from './user/user.module';
 // NgRx
 import {StoreModule} from '@ngrx/store';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
+import {EffectsModule} from '@ngrx/effects';
 import { environment } from '../environments/environment.prod';
 
 @NgModule({
@@ -30,6 +31,7 @@ import { environment } from '../environments/environment.prod';
     UserModule,
     AppRoutingModule,
     StoreModule.forRoot({}),
+    EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({
       name: 'NGRX PRAC APP Devtools',
       maxAge: 25, // number of actions to retain default is 50,
