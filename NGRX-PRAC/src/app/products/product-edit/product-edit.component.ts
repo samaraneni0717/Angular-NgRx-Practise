@@ -7,6 +7,9 @@ import { Product } from '../product';
 import { ProductService } from '../product.service';
 import { GenericValidator } from '../../shared/generic-validator';
 import { NumberValidators } from '../../shared/number.validator';
+import * as fromProduct from '../state/products.reducer';
+import { Store, select } from '@ngrx/store';
+import * as productActions from '../state/products.actions';
 
 @Component({
   selector: 'pm-product-edit',
@@ -27,7 +30,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   private genericValidator: GenericValidator;
 
   constructor(private fb: FormBuilder,
-              private productService: ProductService) {
+              private productService: ProductService, private store: Store<any>) {
 
     // Defines all of the validation messages for the form.
     // These could instead be retrieved from a file or database.
@@ -65,7 +68,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.sub = this.productService.selectedProductChanges$.subscribe(
       selectedProduct => this.displayProduct(selectedProduct)
     );
-
+    // observing selector from the reducer
+    this.store.pipe(select(fromProduct.getCurrentProduct)).subscribe( item => {
+      this.displayProduct(item);
+    });
     // Watch for value changes
     this.productForm.valueChanges.subscribe(
       value => this.displayMessage = this.genericValidator.processMessages(this.productForm)
@@ -117,13 +123,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     if (this.product && this.product.id) {
       if (confirm(`Really delete the product: ${this.product.productName}?`)) {
         this.productService.deleteProduct(this.product.id).subscribe(
-          () => this.productService.changeSelectedProduct(null),
+          () => this.store.dispatch(new productActions.ClearCurrentProduct()),
           (err: any) => this.errorMessage = err.error
         );
+
       }
     } else {
       // No need to delete, it was never saved
-      this.productService.changeSelectedProduct(null);
+      this.store.dispatch(new productActions.ClearCurrentProduct());
     }
   }
 
